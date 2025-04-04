@@ -1,0 +1,22 @@
+<p-splitter
+  [style]="horizontalStyle"
+  layout="horizontal"
+  gutterSize="4"
+  [minSizes]="[20, 20]"
+  [panelSizes]="hSize"
+  stateKey="hKey"
+>
+  <ng-template *ngFor="let p of panels" #panel>
+    <p-splitter
+      layout="vertical"
+      gutterSize="6"
+      [minSizes]="[20, 20]"
+      [panelSizes]="vSize"
+      stateKey="{{ p.key }}"
+    >
+      <ng-template *ngFor="let component of p.components" #panel>
+        <ng-container *ngComponentOutlet="component"></ng-container>
+      </ng-template>
+    </p-splitter>
+  </ng-template>
+</p-splitter>
