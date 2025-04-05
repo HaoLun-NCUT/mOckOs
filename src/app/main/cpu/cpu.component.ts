@@ -4,7 +4,6 @@ import { Component } from '@angular/core';
   selector: 'app-cpu',
   imports: [],
   templateUrl: './cpu.component.html',
-  styleUrl: './cpu.component.scss'
 })
 export class CpuComponent {
 

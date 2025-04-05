@@ -10,8 +10,8 @@
     <p-splitter
       layout="vertical"
       gutterSize="6"
-      [minSizes]="[20, 20]"
-      [panelSizes]="vSize"
+      [minSizes]="[20, 20, 20]"
+      [panelSizes]="p.sizes"
       stateKey="{{ p.key }}"
     >
       <ng-template *ngFor="let component of p.components" #panel>

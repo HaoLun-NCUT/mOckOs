@@ -1,0 +1,64 @@
+<p-table [style]="{'height':'100%' ,'width': '100%' }" [value]="pcbs" dataKey="id" [scrollable]="true" scrollHeight="100%"
+    [tableStyle]="{'height':'100%' ,'width': '100%' }" [showGridlines]="true" [resizableColumns]="true" [rowHover]="true"
+    [columnResizeMode]="'expand'" [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5, 10, 20]">
+    <ng-template #header>
+        <tr>
+            <th style="width:25%">
+                PID
+            </th>
+            <th style="width:25%">
+                暫存器
+            </th>
+            <th style="width:25%">
+                Inventory Status
+            </th>
+            <th style="width:25%">
+                Price
+            </th>
+        </tr>
+    </ng-template>
+    <ng-template #body let-product let-editing="editing">
+        <tr>
+            <td [pEditableColumn]="product.code" pEditableColumnField="code">
+                <p-cellEditor>
+                    <ng-template #input>
+                        <input pInputText type="text" [(ngModel)]="product.code" />
+                    </ng-template>
+                    <ng-template #output>
+                        {{ product.code }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td [pEditableColumn]="product.name" pEditableColumnField="name">
+                <p-cellEditor>
+                    <ng-template #input>
+                        <input pInputText type="text" [(ngModel)]="product.name" required />
+                    </ng-template>
+                    <ng-template #output>
+                        {{ product.name }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td [pEditableColumn]="product.inventoryStatus" pEditableColumnField="inventoryStatus">
+                <p-cellEditor>
+                    <ng-template #input>
+                        <input pInputText [(ngModel)]="product.inventoryStatus" />
+                    </ng-template>
+                    <ng-template #output>
+                        {{ product.inventoryStatus }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td [pEditableColumn]="product.price" pEditableColumnField="price">
+                <p-cellEditor>
+                    <ng-template #input>
+                        <input pInputText type="text" [(ngModel)]="product.price" />
+                    </ng-template>
+                    <ng-template #output>
+                        {{ product.price | currency: 'USD' }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+        </tr>
+    </ng-template>
+</p-table>

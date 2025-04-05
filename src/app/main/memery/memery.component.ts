@@ -4,7 +4,6 @@ import { Component } from '@angular/core';
   selector: 'app-memery',
   imports: [],
   templateUrl: './memery.component.html',
-  styleUrl: './memery.component.scss'
 })
 export class MemeryComponent {
 
