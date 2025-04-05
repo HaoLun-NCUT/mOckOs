@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --configuration production --base-href mOckOs --output-path=docs",
+    "build": "ng build --configuration production --base-href=mOckOs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
