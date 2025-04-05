@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, QueryList, ViewChildren } from '@angular/core';
+import { Component, HostListener, QueryList, ViewChildren } from '@angular/core';
 import { SplitterModule, Splitter } from 'primeng/splitter';
 import { FactoryComponent } from "./main/factory/factory.component";
 import { MemeryComponent } from "./main/memery/memery.component";
@@ -12,30 +12,48 @@ import { PcbComponent } from './main/pcb/pcb.component';
   selector: 'app-root',
   imports: [CommonModule, SplitterModule],
   templateUrl: './app.component.html',
+  styles: `
+
+  `
 })
 export class AppComponent {
   //監聽分隔器(暫時沒用)
   @ViewChildren('horizontal') horizontalSplitters!: QueryList<Splitter>;
   @ViewChildren('vertical') verticalSplitters!: QueryList<Splitter>;
 
-  horizontalStyle = {
-    height: '100vh',
-    width: '100vw',
+  vStyle = {
+    'width': 'fit - content',
+    'height': '100 %',
+    dev: {
+      'width': 'fit - content',
+      'height': '100 %',
+      'background-Color': 'red',
+
+    }
+  }
+  realPanel = {
+    'width': 'fit - content',
+    'height': '100 %',
+    'background-Color': 'red',
   }
 
-  panels: any = [
+  hStyle = {
+    'height': '100vh',
+    'width': '100vw',
+  }
+
+  panels = [
     {
       key: 'vkey-1',
       components: [FactoryComponent, PcbComponent, MemeryComponent],
-      size: [30, 40, 30] //垂直分隔器的比例
+      sizes: [30, 40, 30], //垂直分隔器的比例
+      minSizes: [20, 20, 20], //最小大小
     },
     {
       key: 'vkey-2',
       components: [GanttComponent, CpuComponent],
-      size: [50, 50]  //垂直分隔器的比例
+      sizes: [50, 50],  //垂直分隔器的比例
+      minSizes: [20, 20], //最小大小
     }
   ]
-
-  hSize = [50, 50]; //水平分隔器的比例
-
 }

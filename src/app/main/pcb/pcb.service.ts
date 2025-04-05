@@ -1,133 +1,97 @@
 import { Injectable } from '@angular/core';
-import { Pcb } from './pcb.type';
+import { BehaviorSubject } from 'rxjs';
+import { PCB } from './pcb.model';
+import { Process } from './pcb-process';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PcbService {
+  // 行程資料表
+  private table1: PCB[] = [];
+  private table2: PCB[] = [];
 
-  getProductsMini(): Pcb[] {
-    return [
-      {
-        id: '1001',
-        code: 'ARD328-UNO',
-        name: 'Arduino UNO R3 PCB',
-        description: 'Standard Arduino UNO microcontroller board with ATmega328P',
-        image: 'arduino-uno.jpg',
-        price: 24.95,
-        category: 'Microcontrollers',
-        quantity: 150,
-        inventoryStatus: 'INSTOCK',
-        rating: 5
-      },
-      {
-        id: '1002',
-        code: 'ESP32-DEV',
-        name: 'ESP32 Development Board',
-        description: 'Dual-core Wi-Fi+Bluetooth development board',
-        image: 'esp32-dev.jpg',
-        price: 12.50,
-        category: 'IoT',
-        quantity: 89,
-        inventoryStatus: 'INSTOCK',
-        rating: 4
-      },
-      {
-        id: '1003',
-        code: 'RPI4-PCB',
-        name: 'Raspberry Pi 4 PCB',
-        description: 'Bare PCB for Raspberry Pi 4 Model B',
-        image: 'rpi4-pcb.jpg',
-        price: 35.99,
-        category: 'Single Board Computers',
-        quantity: 5,
-        inventoryStatus: 'LOWSTOCK',
-        rating: 5
-      },
-      {
-        id: '1004',
-        code: 'STM32F4-DISC',
-        name: 'STM32F4 Discovery PCB',
-        description: 'STM32F407VGT6 MCU development board PCB',
-        image: 'stm32f4-disc.jpg',
-        price: 19.99,
-        category: 'Microcontrollers',
-        quantity: 42,
-        inventoryStatus: 'INSTOCK',
-        rating: 4
-      },
-      {
-        id: '1005',
-        code: 'ADLX345-SENS',
-        name: 'ADXL345 Accelerometer PCB',
-        description: '3-axis accelerometer breakout board',
-        image: 'adxl345.jpg',
-        price: 7.95,
-        category: 'Sensors',
-        quantity: 0,
-        inventoryStatus: 'OUTOFSTOCK',
-        rating: 3
-      },
-      {
-        id: '1006',
-        code: 'BLE-NRF52',
-        name: 'nRF52832 BLE Module',
-        description: 'Bluetooth Low Energy PCB with Nordic nRF52832 chipset',
-        image: 'nrf52-ble.jpg',
-        price: 14.50,
-        category: 'Wireless',
-        quantity: 27,
-        inventoryStatus: 'INSTOCK',
-        rating: 4
-      },
-      {
-        id: '1007',
-        code: 'OLED-096',
-        name: '0.96" OLED Display PCB',
-        description: 'I2C OLED display module with driver board',
-        image: 'oled-096.jpg',
-        price: 6.99,
-        category: 'Displays',
-        quantity: 8,
-        inventoryStatus: 'LOWSTOCK',
-        rating: 4
-      },
-      {
-        id: '1008',
-        code: 'TEENSY41-MCU',
-        name: 'Teensy 4.1 PCB',
-        description: 'High-performance ARM Cortex-M7 development board',
-        image: 'teensy41.jpg',
-        price: 27.95,
-        category: 'Microcontrollers',
-        quantity: 35,
-        inventoryStatus: 'INSTOCK',
-        rating: 5
-      },
-      {
-        id: '1009',
-        code: 'GPS-NEO6M',
-        name: 'NEO-6M GPS Module PCB',
-        description: 'GPS receiver module with antenna and EEPROM',
-        image: 'neo6m-gps.jpg',
-        price: 12.95,
-        category: 'Navigation',
-        quantity: 0,
-        inventoryStatus: 'OUTOFSTOCK',
-        rating: 3
-      },
-      {
-        id: '1010',
-        code: 'MOTOR-L298N',
-        name: 'L298N Motor Driver PCB',
-        description: 'Dual H-bridge motor driver module for DC motors',
-        image: 'l298n-driver.jpg',
-        price: 5.99,
-        category: 'Motor Control',
-        quantity: 67,
-        inventoryStatus: 'INSTOCK',
-        rating: 4
-      }
+  // 用於提供給 p-table 訂閱的資料流
+  private table1Subject = new BehaviorSubject<PCB[]>([]);
+  private table2Subject = new BehaviorSubject<PCB[]>([]);
+
+  constructor() {
+    // 初始化行程資料
+    this.initializeTables();
+  }
+
+  /**
+   * 初始化行程資料
+   */
+  private initializeTables(): void {
+    // 將 pcb-process.ts 的資料轉換為 PCB 格式
+    const processTable1: Process[] = [
+      { pid: 'A', triggerTimestamp: 0, executionTime: 5 },
+      { pid: 'B', triggerTimestamp: 2, executionTime: 7 },
+      { pid: 'C', triggerTimestamp: 5, executionTime: 10 },
+      { pid: 'D', triggerTimestamp: 7, executionTime: 8 },
+      { pid: 'E', triggerTimestamp: 8, executionTime: 15 },
+      { pid: 'F', triggerTimestamp: 12, executionTime: 25 },
+      { pid: 'G', triggerTimestamp: 15, executionTime: 12 },
     ];
+
+    const processTable2: Process[] = [
+      { pid: 'A', triggerTimestamp: 0, executionTime: 4 },
+      { pid: 'B', triggerTimestamp: 2, executionTime: 9 },
+      { pid: 'C', triggerTimestamp: 5, executionTime: 6 },
+      { pid: 'D', triggerTimestamp: 10, executionTime: 12 },
+      { pid: 'E', triggerTimestamp: 15, executionTime: 20 },
+    ];
+
+    // 將 Process 轉換為 PCB
+    this.table1 = processTable1.map((process, index) =>
+      this.createPCBFromProcess(process, index + 1)
+    );
+    this.table2 = processTable2.map((process, index) =>
+      this.createPCBFromProcess(process, index + 1)
+    );
+
+    // 更新資料流
+    this.table1Subject.next(this.table1);
+    this.table2Subject.next(this.table2);
+  }
+
+  /**
+   * 將 Process 轉換為 PCB
+   * @param process Process 資料
+   * @param pid 行程 ID
+   * @returns PCB 物件
+   */
+  private createPCBFromProcess(process: Process, pid: number): PCB {
+    return new PCB(
+      process.pid, // PID
+      undefined,//Math.floor(Math.random() * 10) + 1, // 隨機優先級
+      'New', // 初始狀態
+      undefined, // 程式計數器
+      [], // 暫存器
+      1024, // 記憶體限制
+      [], // 已開啟的檔案
+      0, // 剩餘等待時間
+      process.triggerTimestamp, // 觸發時間戳記
+      false, // 是否為週期性行程
+      process.executionTime, // 預估執行時間
+      false // 是否啟用定時器
+    );
+  }
+
+  /**
+   * 獲取 Table1 的資料流
+   * @returns Table1 的 Observable
+   */
+  getTable1Stream() {
+    return this.table1Subject.asObservable();
+  }
+
+  /**
+   * 獲取 Table2 的資料流
+   * @returns Table2 的 Observable
+   */
+  getTable2Stream() {
+    return this.table2Subject.asObservable();
   }
 }
