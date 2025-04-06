@@ -1,29 +1,32 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, QueryList, ViewChildren } from '@angular/core';
+import { Component, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { SplitterModule, Splitter } from 'primeng/splitter';
 import { FactoryComponent } from "./main/factory/factory.component";
 import { MemeryComponent } from "./main/memery/memery.component";
 import { GanttComponent } from "./main/gantt/gantt.component";
 import { CpuComponent } from "./main/cpu/cpu.component";
 import { PcbComponent } from './main/pcb/pcb.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   standalone: true,
   selector: 'app-root',
-  imports: [CommonModule, SplitterModule],
+  imports: [SplitterModule, FormsModule, CommonModule],
   templateUrl: './app.component.html',
-  styles: `
-
-  `
 })
 export class AppComponent {
+
   //監聽分隔器(暫時沒用)
-  @ViewChildren('horizontal') horizontalSplitters!: QueryList<Splitter>;
+  @ViewChild('horizontal') horizontalSplitters!: Splitter;
   @ViewChildren('vertical') verticalSplitters!: QueryList<Splitter>;
+
+  onchange(event: any) {
+    console.log(123);
+  }
 
   vStyle = {
     'width': 'fit - content',
-    'height': '100 %',
+    'height': '100vh',
     dev: {
       'width': 'fit - content',
       'height': '100 %',
@@ -31,29 +34,32 @@ export class AppComponent {
 
     }
   }
-  realPanel = {
-    'width': 'fit - content',
-    'height': '100 %',
-    'background-Color': 'red',
-  }
 
   hStyle = {
-    'height': '100vh',
+    'height': '100%',
     'width': '100vw',
+  }
+
+  componentOBJs: any = {
+    "FactoryComponent": FactoryComponent,
+    "PcbComponent": PcbComponent,
+    "MemeryComponent": MemeryComponent,
+    "CpuComponent": CpuComponent,
+    "GanttComponent": GanttComponent
   }
 
   panels = [
     {
       key: 'vkey-1',
-      components: [FactoryComponent, PcbComponent, MemeryComponent],
-      sizes: [30, 40, 30], //垂直分隔器的比例
-      minSizes: [20, 20, 20], //最小大小
+      components: ['GanttComponent'],
+      sizes: [100],  //垂直分隔器的比例
+      minSizes: [10], //最小大小
     },
     {
       key: 'vkey-2',
-      components: [GanttComponent, CpuComponent],
-      sizes: [50, 50],  //垂直分隔器的比例
-      minSizes: [20, 20], //最小大小
-    }
+      components: ['FactoryComponent', 'PcbComponent', 'MemeryComponent', 'CpuComponent'],
+      sizes: [10, 50, 10, 30], //垂直分隔器的比例
+      minSizes: [10, 10, 10, 10], //最小大小
+    },
   ]
 }

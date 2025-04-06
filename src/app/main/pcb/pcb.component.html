@@ -1,6 +1,6 @@
 <p-table
   class="table"
-  [value]="table1"
+  [value]="table"
   [showGridlines]="true"
   scrollable="true"
   scrollHeight="flex"
@@ -10,7 +10,7 @@
 >
   <!-- 表頭 -->
   <ng-template pTemplate="header">
-    <tr >
+    <tr>
       <th pFrozenColumn>PID</th>
       <th>狀態</th>
       <th>程式計數器</th>
@@ -20,16 +20,31 @@
       <th>觸發時間</th>
       <th>預估時間</th>
       <th>剩餘時間</th>
-      <th>優先度</th>
+      <th>優先權</th>
       <!-- <th>是否為週期性行程</th> -->
-      <!-- <th>定時器是否啟用</th> -->
+      <th>定時器</th>
     </tr>
   </ng-template>
 
   <!-- 表格內容 -->
   <ng-template pTemplate="body" let-row>
     <tr>
-      <td pFrozenColumn>{{ row.pid }}</td>
+      <td pFrozenColumn>
+        <button
+          (click)="toggleRowHighlight(row)"
+          [ngStyle]="{
+            'background-color': row.state == 'Waiting' && !row.isTimerActive
+              ? 'red'
+              : 'transparent'
+          }"
+          pTooltip="該行程不可中斷，因為它已終止，或計時器已啟動"
+          tooltipPosition="left"
+          [tooltipDisabled]="row.state !== 'Terminated' && !row.isTimerActive"
+          [disabled]="row.state === 'Terminated' || row.isTimerActive"
+        >
+          {{ row.pid }}
+        </button>
+      </td>
       <td>{{ row.state }}</td>
       <td>{{ row.programCounter }}</td>
       <td>{{ row.registers.join(", ") }}</td>
@@ -37,10 +52,10 @@
       <td>{{ row.openFiles.join(", ") }}</td>
       <td>{{ row.triggerTimestamp }}</td>
       <td>{{ row.executionTime }}</td>
-      <td>{{ row.remainingWaitTime }}</td>
+      <td>{{ row.remainingTime }}</td>
       <td>{{ row.priority }}</td>
       <!-- <td>{{ row.isPeriodicTask ? "是" : "否" }}</td> -->
-      <!-- <td>{{ row.isTimerActive ? "是" : "否" }}</td> -->
+      <td>{{ row.isTimerActive ? "Y" : "N" }}</td>
     </tr>
   </ng-template>
 </p-table>

@@ -1,38 +1,33 @@
-import { Component, OnInit } from '@angular/core';
+import { PcbService } from './../pcb/pcb.service';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { ButtonModule } from 'primeng/button';
+import { DropdownModule } from 'primeng/dropdown';
+import { AlgorithmService } from '../../common/algorithm.service';
 @Component({
   selector: 'app-factory',
-  imports: [FormsModule, MultiSelectModule, ButtonModule],
+  imports: [FormsModule, DropdownModule],
   templateUrl: './factory.component.html',
   styles: [`
    :host {
     width: 100%;
     height: 100%;
-    background: url('public/work-in-progress.png') no-repeat center center; /* 背景圖片 */
-    background-size: auto 50%; /* 縮小背景圖片 */
-    background-blend-mode: multiply; /* 混合模式，讓圖片與半透明背景結合 */
-    filter: opacity(50%); /* 設置圖片透明度為 50% */
   }`
   ]
 })
 export class FactoryComponent {
-  countries: any[] = [
-    { name: 'USA', code: 'US' },
-    { name: 'Germany', code: 'DE' },
-    { name: 'Italy', code: 'IT' },
-    { name: 'Spain', code: 'ES' },
-    { name: 'France', code: 'FR' },
-    { name: 'United Kingdom', code: 'GB' },
-    { name: 'China', code: 'CN' },
-    { name: 'Japan', code: 'JP' },
-    { name: 'India', code: 'IN' },
-    { name: 'Brazil', code: 'BR' }
-  ];
+  pcbService = inject(PcbService);
+  algorithmService = inject(AlgorithmService);
 
-  selectedCountries: any[] = [];
-  selectedCountry: any = null;
+  options = [
+    { label: '第一、二題', value: 0 },
+    { label: '第三題', value: 1 }
+  ]; // 選單選項
 
-  
+  selectedValue: any // 預設選中的值
+  // 當選擇改變時觸發
+  onSelectionChange(): void {
+    this.pcbService.currentTable = this.selectedValue.value; // 更新資料流的值
+    this.pcbService.initializeTables(); // 初始化行程資料
+  }
+
 }

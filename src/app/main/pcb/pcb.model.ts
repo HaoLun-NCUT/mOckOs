@@ -9,10 +9,10 @@ export class PCB {
 
   // 🔹 計時與排程相關屬性 🔹
   //
-  remainingTime: number; // 剩餘時間 (毫秒)
   triggerTimestamp: number; // 觸發時間戳記 (Unix Timestamp)
-  isPeriodicTask: boolean; // 是否為週期性行程 (true: 週期性, false: 單次)
   executionTime: number; // 預估執行時間 (毫秒)
+  remainingTime: number; // 剩餘時間 (毫秒)
+  isPeriodicTask: boolean; // 是否為週期性行程 (true: 週期性, false: 單次)
   isTimerActive: boolean; // 是否啟用定時器
 
   constructor(
@@ -45,8 +45,8 @@ export class PCB {
   }
 
   // 🔹 更新剩餘時間 🔹
-  updateWaitTime(usedTime: number): void {
-    this.remainingTime = this.executionTime - usedTime;
+  updateRemainingTime(usedTime: number): void {
+    this.remainingTime -= usedTime;
   }
 
   // 🔹 啟動定時器 🔹
@@ -55,10 +55,8 @@ export class PCB {
   }
 
   // 🔹 行程進入 Ready 🔹
-  moveToReady(currentTime: number): void {
-    if (currentTime - this.remainingTime <= 0) {
+  moveToReady(): void {
       this.state = "Ready";
-    }
   }
 
   // 🔹 行程進入 Running 🔹

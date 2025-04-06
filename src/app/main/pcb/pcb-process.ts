@@ -4,7 +4,7 @@ export interface Process {
   executionTime: number; // 行程執行時間
 }
 
-export const table: Process[][] = [
+export const processTables: Process[][] = [
   [
     { pid: "A", triggerTimestamp: 0, executionTime: 5 },
     { pid: "B", triggerTimestamp: 2, executionTime: 7 },
