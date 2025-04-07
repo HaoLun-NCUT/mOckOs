@@ -22,7 +22,8 @@ export class KernelTimeService {
   start(): void {
     if (this.isRunning) return; // 如果已經在運行，則不重複啟動
     this.isRunning = true;
-    this.currentTime.next(this.kernelTime); // 更新資料流
+
+    if (this.kernelTime == 0) this.currentTime.next(this.kernelTime); // 更新資料流
     this.timerSubscription = interval(500).subscribe(() => {
       this.kernelTime++; // 每半秒自增 1
       this.currentTime.next(this.kernelTime); // 更新資料流
