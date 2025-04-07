@@ -23,12 +23,6 @@ jobs:
 
     - name: Install dependencies
       run: npm install
-
-    - name: Delete existing docs directory
-      run: rm -rf ./mOckOs/docs
-
-    - name: Create docs directory
-      run: mkdir -p ./mOckOs/docs
-
+      
     - name: Build Angular project
       run: npm run build
