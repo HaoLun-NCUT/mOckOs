@@ -4,6 +4,11 @@ import { ChartModule, UIChart } from 'primeng/chart';
 import { Subscription } from 'rxjs';
 import { PcbService } from '../pcb/pcb.service';
 import { PCB } from '../pcb/pcb.model';
+import zoomPlugin from 'chartjs-plugin-zoom';
+import { Chart } from 'chart.js';
+
+// 註冊chart插件
+Chart.register(zoomPlugin);
 
 @Component({
   selector: 'app-gantt',
@@ -18,13 +23,19 @@ import { PCB } from '../pcb/pcb.model';
   `]
 })
 export class GanttComponent {
-  @ViewChild(UIChart) chart!: UIChart; // 用於獲取圖表實例
+  @ViewChild('chart') chart!: UIChart; // 用於獲取圖表實例
 
   chartHeight = "100%"; // 圖表高度
   chartWidth = "100%"; // 圖表寬度
 
-  chartData: any;
-  chartOptions: any;
+  chartData = {
+    labels: [] as any[], // Y 軸標籤 (行程 PID)
+    datasets: [] as any[]
+  };
+  chartOptions: any
+
+  lastMax = 30; // 用於平移的 X 軸值
+  lastMin = 0; // 用於平移的 X 軸值
 
   private pcbSubscription!: Subscription;// 訂閱PCB資料流
   private kernelTimeSubscription!: Subscription;// 訂閱核心時間資料流
@@ -36,27 +47,18 @@ export class GanttComponent {
 
   ngOnInit(): void {
 
-    // 要傳入p-chart的資料結構
-    this.chartData = {
-      labels: [], // Y 軸標籤 (行程 PID)
-      datasets: []
-    };
-
     // 訂閱 PCB 資料流，發生時同步 Y 軸標籤
     this.pcbSubscription = this.pcbService.getTableStream().subscribe((pcbTable) => {
-      console.log("PCB 資料流", pcbTable);
       this.pcbData = pcbTable; // 更新 PCB 資料
-      this.chartData.labels = pcbTable.map((pcb) => {
-        return pcb.pid
-      }); // 使用行程的 PID 作為 Y 軸標籤
 
-      console.log("Y 軸標籤", this.chartData.labels)
+      this.chartData.labels = pcbTable.map((pcb) => pcb.pid);; // 清空 Y 軸標籤
+
       this.chartData.datasets[0] = {
         data: [],
-        borderColor: ['#000000'], // 邊框顏色
-        borderWidth: [1] // 設置邊框寬度為 1px
+        borderColor: 'rgb(31, 49, 0)', // 邊框顏色
+        borderWidth: 3, // 設置邊框寬度為 1px
+        backgroundColor:'rgba(199, 255, 103, 0.67)', // 背景顏色
       }
-
       // 手動觸發圖表更新
       this.chart?.refresh();
     });
@@ -72,7 +74,7 @@ export class GanttComponent {
           }
           // 在對應的 Y 軸位置新增一個 bar
           this.chartData.datasets[0].data.push({
-            x: [kernelTime, kernelTime+1], // X 軸範圍，從 kernelTime-1 到 kernelTime
+            x: [kernelTime, kernelTime + 1], // X 軸範圍，從 kernelTime-1 到 kernelTime
             y: pcb.pid // Y 軸值應該是對應的 PID
           });
         }
@@ -86,48 +88,113 @@ export class GanttComponent {
     this.chartOptions = {
       indexAxis: 'y', // 將 XY 軸調換，設置為水平長條圖
       responsive: true,// 圖表RWD
-      maintainAspectRatio: false, // 禁用默認的寬高比
       plugins: {
         legend: {
           position: 'none' // 圖例位置
         },
         tooltip: {
           enabled: true // 啟用提示
+        },
+        zoom: {
+          limits: {
+            x: { min: 0, minRange: 10 }, // X 軸的最小值和最大值
+          },
+          pan: {
+            enabled: true, // 啟用平移
+            mode: 'x', // 僅允許在 X 軸方向平移
+            threshold: 20, // 平移的靈敏度
+            speed: 1000,
+            onPan: ({ chart }: any) => {
+              const xScale = chart.scales.x;
+              const max = xScale.max;
+              const min = xScale.min;
+
+              // 強制對齊到整數
+              const alignedMax = max < this.lastMax ? Math.floor(max) : Math.ceil(max); // 將 max 向上取整
+              const alignedMin = min < this.lastMin ? Math.floor(min) : Math.ceil(min); // 將 min 向上取整
+
+              this.lastMax = alignedMax; // 更新 lastMax
+              this.lastMin = alignedMin; // 更新 lastMin
+
+              // 限制最小值為 0
+              if (alignedMin < 0) {
+                xScale.options.min = 0;
+                this.lastMin = 0; // 更新 lastMin
+              } else {
+                xScale.options.min = alignedMin;
+                xScale.options.max = alignedMax;
+              }
+
+              chart.update('none'); // 更新圖表但禁用動畫
+            },
+          },
+          zoom: {
+            threshold: 10, // 滾輪縮放的靈敏度
+            wheel: {
+              enabled: true // 允許滾輪縮放（可選）
+            },
+            pinch: {
+              enabled: false // 禁用觸控縮放（可選）
+            },
+            mode: 'x', // 僅允許在 X 軸方向縮放
+            onZoom: ({ chart }: any) => {
+              const xScale = chart.scales.x;
+              const max = xScale.max;
+              const min = xScale.min;
+            
+              // 強制對齊到整數
+              const alignedMax = max < this.lastMax ? Math.floor(max) : Math.ceil(max); // 將 max 向上取整
+              const alignedMin = min < this.lastMin ? Math.floor(min) : Math.ceil(min); // 將 min 向上取整
+            
+              this.lastMax = alignedMax; // 更新 lastMax
+              this.lastMin = alignedMin; // 更新 lastMin
+
+              // 限制最小值為 0
+              if (alignedMin < 0) {
+                xScale.options.min = 0;
+                xScale.options.max = 30;
+              } else {
+                xScale.options.min = alignedMin;
+                xScale.options.max = alignedMax;
+              }
+            
+              chart.update('none'); // 更新圖表但禁用動畫
+            }
+          }
         }
       },
       animations: false, // 禁用動畫
       scales: {
         x: {
-          beginAtZero: true, // X 軸從 0 開始
           min: 0, // 固定 X 軸的最小值為 0
-          max: 90, // 固定 X 軸的最大值為 88
+          max: 30, // 固定 X 軸的最大值為 88
           grid: {
             drawTicks: true, // 繪製刻度
             drawBorder: true, // 繪製邊框
-            color: '#e0e0e0', // 刻度線顏色
+            color: 'gray', // 刻度線顏色
           },
-          stacked: true,
           ticks: {
             stepSize: 1, // 刻度間隔
           }
         },
         y: {
           grid: {
-            drawTicks: false, // 不繪製 Y 軸刻度
+            drawTicks: true, // 繪製刻度
+            drawBorder: true, // 繪製邊框
+            color: 'gray', // 刻度線顏色
           },
+          color: 'rgba(0, 0, 0, 0)', // 刻度線顏色
+          backgroundColor: 'rgb(226, 240, 246)', // 刻度線顏色
           ticks: {
+            color: 'black',
             font: {
-              size: 30 // 設置字體大小為 16px
+              size: 30, // 設置字體大小為 16px
             }
           }
         }
       }
     };
-
   }
-
-
-
 
   ngOnDestroy(): void {
     // 取消訂閱以防止記憶體洩漏

@@ -21,8 +21,8 @@
       <th>預估時間</th>
       <th>剩餘時間</th>
       <th>優先權</th>
-      <!-- <th>是否為週期性行程</th> -->
       <th>定時器</th>
+      <!-- <th>是否為週期性行程</th> -->
     </tr>
   </ng-template>
 
@@ -33,9 +33,10 @@
         <button
           (click)="toggleRowHighlight(row)"
           [ngStyle]="{
-            'background-color': row.state == 'Waiting' && !row.isTimerActive
-              ? 'red'
-              : 'transparent'
+            'background-color':
+              row.state == 'Waiting' && !row.isTimerActive
+                ? 'red'
+                : 'transparent'
           }"
           pTooltip="該行程不可中斷，因為它已終止，或計時器已啟動"
           tooltipPosition="left"
@@ -45,17 +46,33 @@
           {{ row.pid }}
         </button>
       </td>
-      <td>{{ row.state }}</td>
-      <td>{{ row.programCounter }}</td>
-      <td>{{ row.registers.join(", ") }}</td>
-      <td>{{ row.memoryLimit }}</td>
-      <td>{{ row.openFiles.join(", ") }}</td>
-      <td>{{ row.triggerTimestamp }}</td>
-      <td>{{ row.executionTime }}</td>
-      <td>{{ row.remainingTime }}</td>
-      <td>{{ row.priority }}</td>
+      <td [ngClass]="{ 'flash-red': row.flashState }">{{ row.state }}</td>
+      <td [ngClass]="{ 'flash-red': row.flashProgramCounter }">
+        {{ row.programCounter }}
+      </td>
+      <td [ngClass]="{ 'flash-red': row.flashRegisters }">
+        {{ row.registers.join(", ") }}
+      </td>
+      <td [ngClass]="{ 'flash-red': row.flashMemoryLimit }">
+        {{ row.memoryLimit }}
+      </td>
+      <td [ngClass]="{ 'flash-red': row.flashOpenFiles }">
+        {{ row.openFiles.join(", ") }}
+      </td>
+      <td [ngClass]="{ 'flash-red': row.flashTriggerTimestamp }">
+        {{ row.triggerTimestamp }}
+      </td>
+      <td [ngClass]="{ 'flash-red': row.flashExecutionTime }">
+        {{ row.executionTime }}
+      </td>
+      <td [ngClass]="{ 'flash-red': row.flashRemainingTime }">
+        {{ row.remainingTime }}
+      </td>
+      <td [ngClass]="{ 'flash-red': row.flashPriority }">{{ row.priority }}</td>
+      <td [ngClass]="{ 'flash-red': row.flashTimerActive }">
+        {{ row.isTimerActive ? "Y" : "N" }}
+      </td>
       <!-- <td>{{ row.isPeriodicTask ? "是" : "否" }}</td> -->
-      <td>{{ row.isTimerActive ? "Y" : "N" }}</td>
     </tr>
   </ng-template>
 </p-table>

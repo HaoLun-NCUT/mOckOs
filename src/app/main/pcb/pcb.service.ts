@@ -1,4 +1,4 @@
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { PCB } from './pcb.model';
 import { Process, processTables } from './pcb-process';
@@ -15,6 +15,12 @@ export class PcbService {
 
   //當前選取的 PCB 表序號
   public  currentTable: number = 0;
+
+  constructor() {
+    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
+    //Add 'implements OnInit' to the class.
+    this.initializeTables();
+  }
 
   /**
    * 初始化行程資料

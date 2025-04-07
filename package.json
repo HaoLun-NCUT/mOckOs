@@ -21,6 +21,7 @@
     "@primeng/themes": "^19.0.10",
     "build": "^0.1.4",
     "chart.js": "^4.4.8",
+    "chartjs-plugin-zoom": "^2.2.0",
     "primeicons": "^7.0.0",
     "primeng": "^19.0.10",
     "run": "^1.5.0",
