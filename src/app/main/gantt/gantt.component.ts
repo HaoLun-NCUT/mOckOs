@@ -72,7 +72,7 @@ export class GanttComponent {
           }
           // 在對應的 Y 軸位置新增一個 bar
           this.chartData.datasets[0].data.push({
-            x: [kernelTime - 1, kernelTime], // X 軸範圍，從 kernelTime-1 到 kernelTime
+            x: [kernelTime, kernelTime+1], // X 軸範圍，從 kernelTime-1 到 kernelTime
             y: pcb.pid // Y 軸值應該是對應的 PID
           });
         }
