@@ -1,0 +1,10 @@
+<div class="cpu-controls">
+  <p-dropdown
+    [options]="options"
+    [(ngModel)]="selectedValue"
+    placeholder="選擇題目"
+    (onChange)="onSelectionChange()"
+    optionLabel="label"
+    autoOptionFocus="true"
+  ></p-dropdown>
+</div>
