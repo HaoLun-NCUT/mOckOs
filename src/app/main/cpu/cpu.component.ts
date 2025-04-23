@@ -8,10 +8,11 @@ import { FormsModule } from '@angular/forms';
 import { PCB } from '../pcb/pcb.model';
 import { PcbService } from '../pcb/pcb.service';
 import { CommonModule } from '@angular/common';
+import { SliderModule, SliderChangeEvent } from 'primeng/slider';
 
 @Component({
   selector: 'app-cpu',
-  imports: [FormsModule, ButtonModule, DropdownModule, CommonModule],
+  imports: [FormsModule, ButtonModule, DropdownModule, CommonModule, SliderModule],
   templateUrl: './cpu.component.html',
   styles: [`
   :host {
@@ -40,7 +41,7 @@ export class CpuComponent implements OnInit, OnDestroy {
   public algorithmService = inject(AlgorithmService);
   private pcbService = inject(PcbService);
 
-
+  cores: number = 1 //用於儲存slider核心數量
   kernelTime: number = 0; // 用於存儲核心時間
   private timeSubscription!: Subscription; // 用於訂閱核心時間的資料流
   private pcbSubscription!: Subscription; // 用於訂閱 PCB 資料流
@@ -52,7 +53,7 @@ export class CpuComponent implements OnInit, OnDestroy {
     // 訂閱核心時間資料流
     this.timeSubscription = this.kernelTimeService.getTimeStream().subscribe(time => {
       this.kernelTime = time; // 更新核心時間
-      this.selectedAlgorithm.value(this.processes,time) // 每次核心時間更新時，重新使用選定的演算法計算結果
+      this.selectedAlgorithm.value(this.processes, time) // 每次核心時間更新時，重新使用選定的演算法計算結果
       this.kernelTimeService.timeCallback.next(time); // 發送當前時間
     });
 
@@ -83,5 +84,10 @@ export class CpuComponent implements OnInit, OnDestroy {
     this.kernelTimeService.stop();
     this.algorithmService.cleanQuere(); // 清除排程
     this.pcbService.initializeTables(); // 初始化行程資料
+  }
+
+  // splider調整核心數量
+  onCoresChange(event: SliderChangeEvent) {
+    event.value ? this.algorithmService.setMaxCore(event.value) : ""
   }
 }

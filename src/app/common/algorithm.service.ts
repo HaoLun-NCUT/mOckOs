@@ -9,7 +9,7 @@ export class AlgorithmService {
   readyQueue: PCB[] = []; // 備妥佇列
   waitingQueue: PCB[] = []; // 等待佇列
   runningSpace: PCB[] = []; // 執行空間
-  rungingTime: number = 0; // 執行時間
+  maxCore: number = 3;//最大執行數量
 
   /**
    *演算法選項
@@ -28,7 +28,6 @@ export class AlgorithmService {
     this.readyQueue.splice(0, this.readyQueue.length); // 清空備妥佇列
     this.waitingQueue.splice(0, this.waitingQueue.length); // 清空等待佇列
     this.runningSpace.splice(0, this.runningSpace.length); // 清空執行空間
-    this.rungingTime = 0; // 清空執行時間
   }
 
   /**佇列刷新服務 */
@@ -67,6 +66,7 @@ export class AlgorithmService {
         break;
       case 'Running':
         let index_run = this.runningSpace.findIndex((process) => process.pid == p.pid); // 找到行程在執行中行程中的索引
+        this.runningSpace[index_run].cleanRunningTime();//執行時間歸零
         this.runningSpace.splice(index_run, 1); // 從執行中行程中移除行程
         break;
     }
@@ -101,19 +101,32 @@ export class AlgorithmService {
   }
 
   /**
+   * 將備妥佇列中的行程迴圈移入執行空間
+   */
+  toRuning() {
+    //檢查執行空間是否為空，且備妥佇列中有行程
+    while (this.runningSpace.length < this.maxCore && this.readyQueue.length > 0) {
+      //將備妥佇列中的第一個行程移入執行空間
+      this.refreshQueue(this.readyQueue[0], 'Running'); //將備妥佇列中的第一個行程移入執行空間
+    }
+  }
+
+  /**
+   * 正在執行中業務邏輯
+   */
+  running() {
+    this.runningSpace.forEach(process => { process.updateRemainingTime(1) }); // 更新剩餘時間
+  }
+
+  /**
    * 1️⃣ 先到先服務（FCFS）
    * @param processes 行程列表
    * @returns 排序後的行程列表
    */
   fcfs(processes: PCB[], kernelTime: number): void {
     this.refreshState(processes, kernelTime);
-    //檢查執行空間是否為空，且備妥佇列中有行程
-    if (this.runningSpace.length === 0 && this.readyQueue.length > 0) {
-      //將備妥佇列中的第一個行程移入執行空間
-      this.refreshQueue(this.readyQueue[0], 'Running'); //將備妥佇列中的第一個行程移入執行空間
-    }
-    this.runningSpace[0]?.updateRemainingTime(1); // 更新剩餘時間
-    this.rungingTime += 1; // 更新執行時間
+    this.toRuning()//短程排班(備妥=>執行)
+    this.running();//執行中業務邏輯
   }
 
   /**
@@ -124,19 +137,14 @@ export class AlgorithmService {
    */
   roundRobin(processes: PCB[], timeQuantum: number, kernelTime: number): void {
     this.refreshState(processes, kernelTime);
-    //如果執行時間大於等於時間片，則將行程移出執行空間，並加入備妥佇列
-    if (this.rungingTime >= timeQuantum && this.runningSpace.length > 0) {
-      this.refreshQueue(this.runningSpace[0], 'Ready'); //將行程移出執行空間，並加入備妥佇列
-    }
-
-    //檢查執行空間是否為空，且備妥佇列中有行程
-    if (this.runningSpace.length === 0 && this.readyQueue.length > 0) {
-      this.rungingTime = 0; // 重置執行時間
-      //將備妥佇列中的第一個行程移入執行空間
-      this.refreshQueue(this.readyQueue[0], 'Running'); //將備妥佇列中的第一個行程移入執行空間
-    }
-    this.runningSpace[0]?.updateRemainingTime(1); // 更新剩餘時間
-    this.rungingTime += 1; // 更新執行時間
+    //遍歷執行空間中的行程，如果執行時間大於等於時間片，則將行程移出執行空間，並加入備妥佇列
+    this.runningSpace.forEach(process => {
+      if (process.rungingTime >= timeQuantum) {
+        this.refreshQueue(this.runningSpace[0], 'Ready'); //將行程移出執行空間，並加入備妥佇列
+      }
+    })
+    this.toRuning()//短程排班(備妥=>執行)
+    this.running();//執行中業務邏輯
   }
 
   /**
@@ -147,19 +155,14 @@ export class AlgorithmService {
   srt(processes: PCB[], kernelTime: number): void {
     this.refreshState(processes, kernelTime);
     this.readyQueue.sort((a, b) => a.remainingTime - b.remainingTime); // 將備妥佇列按預估執行時間排序
-    // 檢查執行空間是否為空，且備妥佇列中有行程
-    if (this.runningSpace.length === 0 && this.readyQueue.length > 0) {
-      // 將備妥佇列中的第一個行程移入執行空間
-      this.refreshQueue(this.readyQueue[0], 'Running'); //將備妥佇列中的第一個行程移入執行空間
-    } else if (this.runningSpace.length > 0 && this.readyQueue.length > 0) {//搶占機制
-      console.log("搶佔評估中",this.runningSpace[0].remainingTime, this.readyQueue[0].remainingTime)
+    this.toRuning()//短程排班(備妥=>執行)
+    if (this.runningSpace.length > 0 && this.readyQueue.length > 0) {//搶占機制
       if (this.runningSpace[0].remainingTime > this.readyQueue[0].remainingTime) {
         this.refreshQueue(this.runningSpace[0], 'Ready'); // 將執行空間中的行程移入備妥佇列
         this.refreshQueue(this.readyQueue[0], 'Running'); // 將備妥佇列中的第一個行程移入執行空間
       }
     }
-    this.runningSpace[0]?.updateRemainingTime(1); // 更新剩餘時間
-    this.rungingTime += 1; // 更新執行時間
+    this.running();//執行中業務邏輯
   }
 
   /**
@@ -171,19 +174,14 @@ export class AlgorithmService {
   sjf_occupy(processes: PCB[], kernelTime: number): void {
     this.refreshState(processes, kernelTime);
     this.readyQueue.sort((a, b) => a.executionTime - b.executionTime); // 將備妥佇列按預估執行時間排序
-    // 檢查執行空間是否為空，且備妥佇列中有行程
-    if (this.runningSpace.length === 0 && this.readyQueue.length > 0) {
-      // 將備妥佇列中的第一個行程移入執行空間
-      this.refreshQueue(this.readyQueue[0], 'Running'); //將備妥佇列中的第一個行程移入執行空間
-    } else if (this.runningSpace.length > 0 && this.readyQueue.length > 0) {//這是搶佔機制的情況
+    this.toRuning()//短程排班(備妥=>執行)
+    if (this.runningSpace.length > 0 && this.readyQueue.length > 0) {//這是搶佔機制的情況
       if (this.runningSpace[0].executionTime > this.readyQueue[0].executionTime) {
         this.refreshQueue(this.runningSpace[0], 'Ready'); // 將執行空間中的行程移入備妥佇列
         this.refreshQueue(this.readyQueue[0], 'Running'); // 將備妥佇列中的第一個行程移入執行空間
       }
     }
-
-    this.runningSpace[0]?.updateRemainingTime(1); // 更新剩餘時間
-    this.rungingTime += 1; // 更新執行時間
+    this.running();//執行中業務邏輯
   }
 
   /**
@@ -195,13 +193,15 @@ export class AlgorithmService {
   sjf_fcfs(processes: PCB[], kernelTime: number): void {
     const newpcb = this.refreshState(processes, kernelTime);
     this.readyQueue.sort((a, b) => a.executionTime - b.executionTime); // 將備妥佇列按預估執行時間排序
-    // 檢查執行空間是否為空，且備妥佇列中有行程
-    if (this.runningSpace.length === 0 && this.readyQueue.length > 0) {
-      // 將備妥佇列中的第一個行程移入執行空間
-      this.refreshQueue(this.readyQueue[0], 'Running'); //將備妥佇列中的第一個行程移入執行空間
-    }
 
-    this.runningSpace[0]?.updateRemainingTime(1); // 更新剩餘時間
-    this.rungingTime += 1; // 更新執行時間
+    this.toRuning()//短程排班(備妥=>執行)
+    this.running();//執行中業務邏輯
+  }
+
+  /**
+   * 設定核心數量
+   */
+  setMaxCore(core: number) {
+    this.maxCore = core;
   }
 }

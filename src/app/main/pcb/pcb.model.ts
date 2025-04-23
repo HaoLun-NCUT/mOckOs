@@ -6,7 +6,6 @@ export class PCB {
   registers: number[]; // 暫存器
   memoryLimit: number; // 記憶體限制
   openFiles: string[]; // 已開啟的檔案列表
-
   // 🔹 計時與排程相關屬性 🔹
   //
   triggerTimestamp: number; // 觸發時間戳記 (Unix Timestamp)
@@ -14,6 +13,7 @@ export class PCB {
   remainingTime: number; // 剩餘時間 (毫秒)
   isPeriodicTask: boolean; // 是否為週期性行程 (true: 週期性, false: 單次)
   isTimerActive: boolean; // 是否啟用定時器
+  rungingTime: number;//已執行時間
 
   constructor(
     pid: string,
@@ -27,7 +27,8 @@ export class PCB {
     triggerTimestamp: number,
     isPeriodicTask: boolean,
     executionTime: number,
-    isTimerActive: boolean
+    isTimerActive: boolean,
+    rungingTime: number = 0,
   ) {
     this.pid = pid;
     this.priority = priority;
@@ -42,11 +43,13 @@ export class PCB {
     this.isPeriodicTask = isPeriodicTask;
     this.executionTime = executionTime;
     this.isTimerActive = isTimerActive;
+    this.rungingTime = rungingTime;
   }
 
   // 🔹 更新剩餘時間 🔹
   updateRemainingTime(usedTime: number): void {
     this.remainingTime -= usedTime;
+    this.rungingTime += usedTime;
   }
 
   // 🔹 啟動定時器 🔹
@@ -56,7 +59,7 @@ export class PCB {
 
   // 🔹 行程進入 Ready 🔹
   moveToReady(): void {
-      this.state = "Ready";
+    this.state = "Ready";
   }
 
   // 🔹 行程進入 Running 🔹
@@ -73,4 +76,10 @@ export class PCB {
   moveToTerminated(): void {
     this.state = "Terminated";
   }
+
+  // 🔹 執行時間歸0 🔹
+  cleanRunningTime(): void {
+    this.rungingTime = 0
+  }
+
 }
