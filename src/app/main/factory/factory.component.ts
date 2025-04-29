@@ -20,7 +20,8 @@ export class FactoryComponent {
 
   options = [
     { label: '第一、二題', value: 0 },
-    { label: '第三題', value: 1 }
+    { label: '第三題', value: 1 },
+    { label: '變化一', value: 2 }
   ]; // 選單選項
 
   selectedValue: any // 預設選中的值

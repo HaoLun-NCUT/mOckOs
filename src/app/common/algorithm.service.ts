@@ -9,7 +9,7 @@ export class AlgorithmService {
   readyQueue: PCB[] = []; // 備妥佇列
   waitingQueue: PCB[] = []; // 等待佇列
   runningSpace: PCB[] = []; // 執行空間
-  maxCore: number = 3;//最大執行數量
+  maxCore: number = 1;//最大執行數量
 
   /**
    *演算法選項
@@ -29,6 +29,8 @@ export class AlgorithmService {
     this.waitingQueue.splice(0, this.waitingQueue.length); // 清空等待佇列
     this.runningSpace.splice(0, this.runningSpace.length); // 清空執行空間
   }
+
+  /** */
 
   /**佇列刷新服務 */
   refreshQueue(p: PCB, tobe: string): void {
@@ -88,6 +90,7 @@ export class AlgorithmService {
         return process; // 如果行程狀態為 Running，則不進行任何操作
       }
 
+      //如果觸發時間戳記小於等於目前時間，則將行程狀態設置為 Ready
       if (process.triggerTimestamp <= kernelTime && process.isTimerActive) {
         this.refreshQueue(process, 'Ready'); //佇列更新
         process.isTimerActive = false; // 取消定時器
@@ -104,10 +107,14 @@ export class AlgorithmService {
    * 將備妥佇列中的行程迴圈移入執行空間
    */
   toRuning() {
-    //檢查執行空間是否為空，且備妥佇列中有行程
-    while (this.runningSpace.length < this.maxCore && this.readyQueue.length > 0) {
+    //檢查執行狀態的行程是否"不"剛好為執行空間的大小，且備妥佇列中有行程
+    while (this.runningSpace.length != this.maxCore && this.readyQueue.length > 0) {
       //將備妥佇列中的第一個行程移入執行空間
-      this.refreshQueue(this.readyQueue[0], 'Running'); //將備妥佇列中的第一個行程移入執行空間
+      if (this.runningSpace.length < this.maxCore)
+        this.refreshQueue(this.readyQueue[0], 'Running'); //將備妥佇列中的第一個行程移入執行空間
+      else {
+        this.refreshQueue(this.runningSpace[0], 'Ready'); //將執行空間中的第一個行程移入備妥柱列
+      }
     }
   }
 
@@ -115,7 +122,9 @@ export class AlgorithmService {
    * 正在執行中業務邏輯
    */
   running() {
-    this.runningSpace.forEach(process => { process.updateRemainingTime(1) }); // 更新剩餘時間
+    this.runningSpace.forEach(process => { process.updateRemainingTime(1) }); // 對執行空間中的行程更新剩餘時間
+    this.waitingQueue.forEach(process => { process.updateWaitingTime() }); // 對備妥佇列中的行程更新等待時間
+    this.readyQueue.forEach(process => { process.updateReadyTime() }); // 對備妥佇列中的行程更新等待時間
   }
 
   /**
@@ -143,7 +152,7 @@ export class AlgorithmService {
         this.refreshQueue(this.runningSpace[0], 'Ready'); //將行程移出執行空間，並加入備妥佇列
       }
     })
-    this.toRuning()//短程排班(備妥=>執行)
+    this.toRuning()//短程排班(備妥=>執行)(檢查核心失能的情況可能發生執行=>備妥)
     this.running();//執行中業務邏輯
   }
 
@@ -202,6 +211,7 @@ export class AlgorithmService {
    * 設定核心數量
    */
   setMaxCore(core: number) {
+    console.log("設定核心數量", core);
     this.maxCore = core;
   }
 }

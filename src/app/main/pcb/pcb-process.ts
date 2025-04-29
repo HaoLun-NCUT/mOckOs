@@ -20,5 +20,14 @@ export const processTables: Process[][] = [
     { pid: "C", triggerTimestamp: 5, executionTime: 6 },
     { pid: "D", triggerTimestamp: 10, executionTime: 12 },
     { pid: "E", triggerTimestamp: 15, executionTime: 20 },
-  ]
+  ],
+  [
+    { pid: "A", triggerTimestamp: 0, executionTime: 20 },
+    { pid: "B", triggerTimestamp: 1, executionTime: 15 },
+    { pid: "C", triggerTimestamp: 3, executionTime: 7 },
+    { pid: "D", triggerTimestamp: 6, executionTime: 4 },
+    { pid: "E", triggerTimestamp: 8, executionTime: 10 },
+    { pid: "F", triggerTimestamp: 12, executionTime: 5 },
+    { pid: "G", triggerTimestamp: 18, executionTime: 3 },
+  ],
 ];

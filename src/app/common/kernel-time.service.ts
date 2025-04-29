@@ -16,8 +16,6 @@ export class KernelTimeService {
 
   private isRunning = false; // 用於標記是否正在運行
 
-  constructor() { }
-
   // 啟動時間更新
   start(): void {
     if (this.isRunning) return; // 如果已經在運行，則不重複啟動

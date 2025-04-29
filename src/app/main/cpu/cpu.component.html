@@ -1,7 +1,7 @@
 <div>
   <label class="w-full mb-4">{{ cores }}</label>
   <div class="card flex justify-center">
-    <p-slider max="4" min="0" [(ngModel)]="cores" (onChange)="onCoresChange($event)" styleClass="w-56" />
+    <p-slider max="4" min="1" [(ngModel)]="cores" (onChange)="onCoresChange($event)" styleClass="w-56" />
   </div>
   <div class="kernel-time-display">
     <h3>核心時間：{{ kernelTime }}</h3>

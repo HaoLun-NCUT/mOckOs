@@ -7,7 +7,8 @@ export class PCB {
   memoryLimit: number; // 記憶體限制
   openFiles: string[]; // 已開啟的檔案列表
   // 🔹 計時與排程相關屬性 🔹
-  //
+  cumulativeWaitingTime: number; // 累計等待時間 (毫秒)
+  cumulativeReadyTime: number; // 累計備妥時間 (毫秒)
   triggerTimestamp: number; // 觸發時間戳記 (Unix Timestamp)
   executionTime: number; // 預估執行時間 (毫秒)
   remainingTime: number; // 剩餘時間 (毫秒)
@@ -28,7 +29,6 @@ export class PCB {
     isPeriodicTask: boolean,
     executionTime: number,
     isTimerActive: boolean,
-    rungingTime: number = 0,
   ) {
     this.pid = pid;
     this.priority = priority;
@@ -37,13 +37,14 @@ export class PCB {
     this.registers = registers;
     this.memoryLimit = memoryLimit;
     this.openFiles = openFiles;
-
+    this.cumulativeWaitingTime = 0;
+    this.cumulativeReadyTime = 0;
     this.remainingTime = remainingWaitTime;
     this.triggerTimestamp = triggerTimestamp;
     this.isPeriodicTask = isPeriodicTask;
     this.executionTime = executionTime;
     this.isTimerActive = isTimerActive;
-    this.rungingTime = rungingTime;
+    this.rungingTime = 0;
   }
 
   // 🔹 更新剩餘時間 🔹
@@ -82,4 +83,13 @@ export class PCB {
     this.rungingTime = 0
   }
 
+  // 🔹 更新累積等待時間 🔹
+  updateWaitingTime(): void {
+    this.cumulativeWaitingTime += 1;
+  }
+
+  // 🔹 更新累積備妥時間 🔹
+  updateReadyTime(): void {
+    this.cumulativeReadyTime += 1;
+  }
 }

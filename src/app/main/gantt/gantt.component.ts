@@ -34,7 +34,7 @@ export class GanttComponent {
   };
   chartOptions: any
 
-  lastMax = 30; // 用於平移的 X 軸值
+  lastMax = 100; // 用於平移的 X 軸值
   lastMin = 0; // 用於平移的 X 軸值
 
   private pcbSubscription!: Subscription;// 訂閱PCB資料流
@@ -167,7 +167,7 @@ export class GanttComponent {
       scales: {
         x: {
           min: 0, // 固定 X 軸的最小值為 0
-          max: 30, // 固定 X 軸的最大值為 88
+          max: 100, // 固定 X 軸的最大值為 88
           grid: {
             drawTicks: true, // 繪製刻度
             drawBorder: true, // 繪製邊框
