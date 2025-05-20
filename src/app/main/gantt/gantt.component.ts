@@ -42,6 +42,7 @@ export class GanttComponent {
 
   private pcbService = inject(PcbService); // 用於獲取 PCB 資料流
   private kernelTimeService = inject(KernelTimeService); // 用於獲取 Kernel 時間資料流
+  private kernelTime!: number; // Kernel 時間
 
   private pcbData!: PCB[]; // 訂閱取得的PCB 資料
 

@@ -47,6 +47,8 @@ export class PCB {
     this.rungingTime = 0;
   }
 
+  commands: Function[] = []; // 儲存行程的指令
+
   // 🔹 更新剩餘時間 🔹
   updateRemainingTime(usedTime: number): void {
     this.remainingTime -= usedTime;
