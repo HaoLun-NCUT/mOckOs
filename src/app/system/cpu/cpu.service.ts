@@ -4,7 +4,7 @@ import { BehaviorSubject, interval, Subscription } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class KernelTimeService {
+export class CpuService {
   // 自定義的系統時間，初始為 0，每次更新時加 1
   private kernelTime = 0; // 用於存儲自定義系統時間
 
@@ -39,7 +39,6 @@ export class KernelTimeService {
 
   // 終止時間更新並重置時間
   stop(): void {
-    if (this.kernelTime === 0) return; // 如果時間已經是 0，則不執行操作
     this.pause(); // 停止更新
     this.kernelTime = 0; // 重置自定義系統時間
     this.currentTime.next(0); // 重置資料流

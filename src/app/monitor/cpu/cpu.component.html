@@ -1,0 +1,51 @@
+<div style="display: flex; align-items: center; gap: 20px">
+  <div>
+    <h3>核心時間：{{ kernelTime }}</h3>
+  </div>
+  <div>
+    <label>核心數量:{{ cores }}</label>
+    <p-slider
+      max="4"
+      min="1"
+      [(ngModel)]="cores"
+      (onChange)="onCoresChange($event)"
+      styleClass="w-56"
+    />
+  </div>
+</div>
+
+<div class="cpu-controls">
+  <p-dropdown
+    [options]="algorithmService.algorithmOptions"
+    [(ngModel)]="selectedAlgorithm"
+    placeholder="選擇演算法"
+    optionLabel="label"
+    autoOptionFocus="true"
+  ></p-dropdown>
+</div>
+
+<div>
+  <p-button
+    label="啟動"
+    icon="pi pi-play"
+    (click)="startKernelTime()"
+  ></p-button>
+  <p-button
+    label="暫停"
+    icon="pi pi-pause"
+    (click)="pauseKernelTime()"
+  ></p-button>
+  <p-button
+    label="重置"
+    icon="pi pi-stop"
+    (click)="stopKernelTime()"
+  ></p-button>
+</div>
+<div class="queue-display">
+  <h3>{{ algorithmService.runningSpace.quere_name }}</h3>
+  @for (process of algorithmService.runningSpace.queue; track $index) {
+  <p-card header="PID: {{ process.pid }}">
+    剩餘時間:{{ process.remainingTime }}
+  </p-card>
+  }
+</div>

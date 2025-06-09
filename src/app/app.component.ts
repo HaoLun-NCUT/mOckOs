@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { SplitterModule, Splitter } from 'primeng/splitter';
-import { FactoryComponent } from "./main/factory/factory.component";
-import { MemeryComponent } from "./main/memery/memery.component";
-import { GanttComponent } from "./main/gantt/gantt.component";
-import { CpuComponent } from "./main/cpu/cpu.component";
-import { PcbComponent } from './main/pcb/pcb.component';
+import { FactoryComponent } from './monitor/factory/factory.component';
+import { MemeryComponent } from './monitor/memery/memery.component';
+import { GanttComponent } from './monitor/gantt/gantt.component';
+import { CpuComponent } from './monitor/cpu/cpu.component';
+import { PcbComponent } from './monitor/pcb/pcb.component';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -52,14 +52,20 @@ export class AppComponent {
     {
       key: 'vkey-1',
       components: ['GanttComponent'],
-      sizes: [100],  //垂直分隔器的比例
+      sizes: [50],  //垂直分隔器的比例
       minSizes: [10], //最小大小
+    },
+        {
+      key: 'vkey-1',
+      components: ['PcbComponent','CpuComponent'],
+      sizes: [50,20],  //垂直分隔器的比例
+      minSizes: [10,10], //最小大小
     },
     {
       key: 'vkey-2',
-      components: ['FactoryComponent', 'PcbComponent', 'MemeryComponent', 'CpuComponent'],
-      sizes: [10, 50, 10, 30], //垂直分隔器的比例
-      minSizes: [10, 10, 10, 10], //最小大小
+      components: ['FactoryComponent', 'MemeryComponent' ],
+      sizes: [10, 50], //垂直分隔器的比例
+      minSizes: [10, 10], //最小大小
     },
   ]
 }

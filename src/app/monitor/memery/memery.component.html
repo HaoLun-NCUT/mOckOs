@@ -1,0 +1,18 @@
+<div class="queue-display">
+  <h3>{{ waitingQueue.quere_name }}</h3>
+  @for(process of waitingQueue.queue; track process.pid){
+  <p-card header="PID: {{ process.pid }}">
+    剩餘時間: {{ process.remainingTime }}
+  </p-card>
+  }
+</div>
+
+<div class="queue-display">
+  @for(readyQueue of readyQueues; track readyQueue) {
+  <h3>{{ readyQueue.quere_name }}</h3>
+  @for (process of readyQueue.queue; track process.pid) {
+  <p-card header="PID: {{ process.pid }}">
+    剩餘時間: {{ process.remainingTime }}
+  </p-card>
+  } }
+</div>
